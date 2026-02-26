@@ -120,37 +120,52 @@ export async function registerRoutes(
 }
 
 async function seedDatabase() {
-  const employees = await storage.getEmployees();
-  if (employees.length === 0) {
-    const admin = await storage.createEmployee({
-      empNo: 'admin',
-      name: 'Admin User',
-      section: 'management',
-      weeklyOff: 'SUN',
-      password: 'admin',
-      isAdmin: true,
-    });
+  const existingEmployees = await storage.getEmployees();
+  if (existingEmployees.length <= 3) { // Only seed if we haven't added the bulk data yet
+    // Clear existing to avoid duplicates if needed, or just skip if already seeded
+    // For this task, we will ensure all requested employees are present.
 
-    const emp1 = await storage.createEmployee({
-      empNo: '2000987',
-      name: 'DEONATH SHENDE',
-      section: 'DISPATCH',
-      weeklyOff: 'THU',
-      password: 'password123',
-      isAdmin: false,
-    });
-    const emp2 = await storage.createEmployee({
-      empNo: '2002322',
-      name: 'SITAKANTA BARICK',
-      section: 'DISPATCH',
-      weeklyOff: 'FRI',
-      password: 'password123',
-      isAdmin: false,
-    });
-    
-    const date1 = '2024-03-01';
-    await storage.createSchedule({ employeeId: emp1.id, date: date1, shift: 'B' });
-    await storage.createSchedule({ employeeId: emp2.id, date: date1, shift: 'C' });
+    const employeesToSeed = [
+      { empNo: 'admin', name: 'Admin User', section: 'management', weeklyOff: 'SUN', password: 'admin', isAdmin: true },
+      // DISPATCH & DRI EMPLOYEES
+      { empNo: '2000 987', name: 'DEONATH SHENDE', section: 'DISPATCH', weeklyOff: 'THU', password: 'password123', isAdmin: false },
+      { empNo: '2002322', name: 'SITAKANTA BARICK', section: 'DISPATCH', weeklyOff: 'FRI', password: 'password123', isAdmin: false },
+      { empNo: '2002228', name: 'JITENDRA BEHERA', section: 'DISPATCH', weeklyOff: 'SAT', password: 'password123', isAdmin: false },
+      { empNo: '2002409', name: 'SRIKANTH BAHADUR', section: 'DISPATCH', weeklyOff: 'SUN', password: 'password123', isAdmin: false },
+      { empNo: '71002493', name: 'BIPRO BANIK', section: 'DISPATCH', weeklyOff: 'MON', password: 'password123', isAdmin: false },
+      { empNo: '1000048', name: 'ANKIT THAKARE', section: 'DISPATCH', weeklyOff: 'TUE', password: 'password123', isAdmin: false },
+      { empNo: '2000491', name: 'AKHILESH PRASAD', section: 'DISPATCH', weeklyOff: 'WED', password: 'password123', isAdmin: false },
+      { empNo: '71002879', name: 'UMESH WANKHADE', section: 'DISPATCH', weeklyOff: 'THU', password: 'password123', isAdmin: false },
+      { empNo: '71004192', name: 'Amit Chatte', section: 'DISPATCH', weeklyOff: 'FRI', password: 'password123', isAdmin: false },
+      { empNo: '7100198', name: 'YOGESH SADAFALE', section: 'DISPATCH', weeklyOff: 'THU', password: 'password123', isAdmin: false },
+      { empNo: '71003359', name: 'PAWAN S CHANDANKHEDE', section: 'DISPATCH', weeklyOff: 'WED', password: 'password123', isAdmin: false },
+      { empNo: '71004026', name: 'SANKET KHADE', section: 'DISPATCH', weeklyOff: 'MON', password: 'password123', isAdmin: false },
+      { empNo: '2002092', name: 'P.S.LOKHANDE', section: 'DISPATCH', weeklyOff: 'TUE', password: 'password123', isAdmin: false },
+      // WEIGHBRIDGE EMPLOYEES
+      { empNo: '2002461', name: 'SARVIN DERKAR', section: 'WEIGHBRIDGE', weeklyOff: 'SAT', password: 'password123', isAdmin: false },
+      { empNo: '1000012', name: 'NANDKISHOR VAIDYA', section: 'WEIGHBRIDGE', weeklyOff: 'SUN', password: 'password123', isAdmin: false },
+      { empNo: '2002492', name: 'ATISH KALE', section: 'WEIGHBRIDGE', weeklyOff: 'MON', password: 'password123', isAdmin: false },
+      { empNo: 'WB 1097', name: 'RAVINDRA DAWARE', section: 'WEIGHBRIDGE', weeklyOff: 'TUE', password: 'password123', isAdmin: false },
+      { empNo: '71002890', name: 'GOVIND DAWARE', section: 'WEIGHBRIDGE', weeklyOff: 'WED', password: 'password123', isAdmin: false },
+      { empNo: '2002460', name: 'SANJAY DERKAR', section: 'WEIGHBRIDGE', weeklyOff: 'THU', password: 'password123', isAdmin: false },
+      { empNo: '2002381', name: 'ABHISHEK LIHITKAR', section: 'WEIGHBRIDGE', weeklyOff: 'FRI', password: 'password123', isAdmin: false },
+      { empNo: '71004060', name: 'AMIT DERKAR', section: 'WEIGHBRIDGE', weeklyOff: 'SAT', password: 'password123', isAdmin: false },
+      { empNo: '71003992', name: 'ANKIT SHARMA', section: 'WEIGHBRIDGE', weeklyOff: 'SUN', password: 'password123', isAdmin: false },
+      { empNo: '71004418', name: 'SAMEER MAHURE', section: 'WEIGHBRIDGE', weeklyOff: 'SAT', password: 'password123', isAdmin: false },
+      { empNo: '2000341', name: 'SHRIKANT PARANJAPE', section: 'WEIGHBRIDGE', weeklyOff: 'SUN', password: 'password123', isAdmin: false },
+      { empNo: '2000490', name: 'SUGREEV YADAV', section: 'WEIGHBRIDGE', weeklyOff: 'MON', password: 'password123', isAdmin: false },
+      { empNo: '71003528', name: 'GAURAV J SELUKAR', section: 'WEIGHBRIDGE', weeklyOff: 'TUE', password: 'password123', isAdmin: false },
+      { empNo: 'WB 1090', name: 'SUNIL BHARDKAR', section: 'WEIGHBRIDGE', weeklyOff: 'WED', password: 'password123', isAdmin: false },
+      { empNo: '71002505', name: 'ISHWAR MANE', section: 'WEIGHBRIDGE', weeklyOff: 'THU', password: 'password123', isAdmin: false },
+      { empNo: '1000051', name: 'NIKHIL RAJURKAR', section: 'WEIGHBRIDGE', weeklyOff: 'FRI', password: 'password123', isAdmin: false },
+    ];
+
+    for (const empData of employeesToSeed) {
+      const exists = await storage.getUserByEmpNo(empData.empNo);
+      if (!exists) {
+        await storage.createEmployee(empData);
+      }
+    }
   }
 }
 
